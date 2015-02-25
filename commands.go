@@ -13,6 +13,7 @@ import (
 
 var Commands = []cli.Command{
 	commandCreate,
+	commandReset,
 }
 
 var commandCreate = cli.Command{
@@ -21,6 +22,14 @@ var commandCreate = cli.Command{
 	Description: `
 `,
 	Action: doCreate,
+}
+
+var commandReset = cli.Command{
+	Name:  "reset",
+	Usage: "",
+	Description: `
+`,
+	Action: doReset,
 }
 
 func debug(v ...interface{}) {
@@ -47,6 +56,13 @@ func doCreate(c *cli.Context) {
 	convert("icon.tif")
 	setIcon("icns.icns")
 	sweep()
+}
+
+func doReset(c *cli.Context) {
+	err := exec.Command("rm", "Icon\r").Run()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func generateIcon(filename string) {
