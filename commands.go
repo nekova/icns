@@ -12,16 +12,25 @@ import (
 )
 
 var Commands = []cli.Command{
-	commandCreate,
+	commandGenerate,
 	commandReset,
+	commandSet,
 }
 
-var commandCreate = cli.Command{
-	Name:  "create",
+var commandGenerate = cli.Command{
+	Name:  "generate",
 	Usage: "",
 	Description: `
 `,
-	Action: doCreate,
+	Action: doGenerate,
+}
+
+var commandSet = cli.Command{
+	Name:  "set",
+	Usage: "",
+	Description: `
+`,
+	Action: doSet,
 }
 
 var commandReset = cli.Command{
@@ -44,18 +53,29 @@ func assert(err error) {
 	}
 }
 
-func doCreate(c *cli.Context) {
+func doGenerate(c *cli.Context) {
 	path := c.Args().Get(0)
 
 	if path == "" {
-		cli.ShowCommandHelp(c, "create")
+		cli.ShowCommandHelp(c, "generate")
 		os.Exit(1)
 	}
 
 	generateIcon(path)
-	convert("icon.tif")
-	setIcon("icns.icns")
-	sweep()
+}
+
+func doSet(c *cli.Context) {
+	filename := c.Args().Get(0)
+
+	ext := filepath.Ext(filename)
+	if ext == ".icns" {
+		fmt.Println(ext)
+		fmt.Println(filename)
+		setIcon(filename)
+	} else {
+		generateIcon(filename)
+		setIcon("icns.icns")
+	}
 }
 
 func doReset(c *cli.Context) {
@@ -86,6 +106,8 @@ func generateIcon(filename string) {
 	mw.CompositeImage(im, imagick.COMPOSITE_OP_LINEAR_DODGE, 0, 0)
 	mw.CompositeImage(fm, imagick.COMPOSITE_OP_COPY_OPACITY, 0, 0)
 	mw.WriteImage("./icon.tif")
+	convert("icon.tif")
+	sweep("icon.tif")
 }
 
 func convert(filename string) {
@@ -109,8 +131,8 @@ func getExecPath() string {
 	return execPath
 }
 
-func sweep() {
-	err := exec.Command("rm", "icns.icns", "icon.tif").Run()
+func sweep(filename string) {
+	err := exec.Command("rm", filename).Run()
 	if err != nil {
 		panic(err)
 	}
