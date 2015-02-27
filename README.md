@@ -1,5 +1,6 @@
 icns
 ====
+![](/images/usage.gif)
 
 ## Description
 icns provides to generate and set your own custom folder icons.
