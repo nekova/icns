@@ -2,8 +2,19 @@ icns
 ====
 
 ## Description
+icns provides to generate and set your own custom folder icons.
+
+```bash
+$ icns generate /Users/nekova/Picture/awesome.png
+#=> Generate .icns file in current directory
+```
 
 ## Usage
+```bash
+'icns' generate <path/to/image-file>
+'icns' set (<path/to/image-file> | <path/to/icns-file>)
+'icns' reset
+```
 
 ## Install
 
