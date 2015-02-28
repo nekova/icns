@@ -19,7 +19,7 @@ var Commands = []cli.Command{
 
 var commandGenerate = cli.Command{
 	Name:  "generate",
-	Usage: "",
+	Usage: "Generate your custom icon",
 	Description: `
 `,
 	Action: doGenerate,
@@ -27,7 +27,7 @@ var commandGenerate = cli.Command{
 
 var commandSet = cli.Command{
 	Name:  "set",
-	Usage: "",
+	Usage: "Set your custom icon",
 	Description: `
 `,
 	Action: doSet,
@@ -35,7 +35,7 @@ var commandSet = cli.Command{
 
 var commandReset = cli.Command{
 	Name:  "reset",
-	Usage: "",
+	Usage: "Reset your custom icon",
 	Description: `
 `,
 	Action: doReset,
@@ -66,15 +66,19 @@ func doGenerate(c *cli.Context) {
 
 func doSet(c *cli.Context) {
 	filename := c.Args().Get(0)
+	dir := absPath(c.Args().Get(1))
+
+	if filename == "" {
+		cli.ShowCommandHelp(c, "set")
+		os.Exit(1)
+	}
 
 	ext := filepath.Ext(filename)
 	if ext == ".icns" {
-		fmt.Println(ext)
-		fmt.Println(filename)
-		setIcon(filename)
+		setIcon(filename, dir)
 	} else {
 		generateIcon(filename)
-		setIcon("icns.icns")
+		setIcon("icns.icns", dir)
 	}
 }
 
@@ -114,10 +118,16 @@ func convert(filename string) {
 	exec.Command("tiff2icns", "-noLarge", filename, "icns.icns").Output()
 }
 
-func setIcon(filename string) {
+func setIcon(filename, dir string) {
 	execPath := getExecPath()
-	currentPath, err := filepath.Abs("./")
-	err = exec.Command("sh", execPath+"/setIcon.sh", currentPath+"/"+filename, currentPath).Run()
+	err := exec.Command("sh", execPath+"/setIcon.sh", dir+"/"+filename, dir).Run()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func sweep(filename string) {
+	err := exec.Command("rm", filename).Run()
 	if err != nil {
 		panic(err)
 	}
@@ -131,9 +141,10 @@ func getExecPath() string {
 	return execPath
 }
 
-func sweep(filename string) {
-	err := exec.Command("rm", filename).Run()
+func absPath(path string) string {
+	abspath, err := filepath.Abs(path)
 	if err != nil {
 		panic(err)
 	}
+	return abspath
 }
